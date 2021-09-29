@@ -1,9 +1,19 @@
-from numpy import exp, array, random, dot
-training_set_inputs = array([[0, 0, 1], [1, 1, 1], [1, 0, 1], [0, 1, 1]])
-training_set_outputs = array([[0, 1, 1, 0]]).T
-random.seed(1)
-synaptic_weights = 2 * random.random((3, 1)) - 1
-for iteration in range(10000):
-    output = 1 / (1 + exp(-(dot(training_set_inputs, synaptic_weights))))
-    synaptic_weights += dot(training_set_inputs.T, (training_set_outputs - output) * output * (1 - output))
-print(1 / (1 + exp(-(dot(array([1, 0, 0]), synaptic_weights)))))
+import tensorflow as tf
+mnist = tf.keras.datasets.mnist
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Flatten(input_shape=(28, 28)),
+  tf.keras.layers.Dense(128, activation='relu'),
+  tf.keras.layers.Dropout(0.2),
+  tf.keras.layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=5)
+model.evaluate(x_test, y_test)
